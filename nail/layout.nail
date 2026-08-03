@@ -1,0 +1,119 @@
+// The page shell: head, sticky header, footer, and the document itself.
+//
+// The site is one long page, so every nav link is an in-page anchor. They live
+// in one list here and are rendered into both the header and the footer.
+
+struct NavLink {
+    href:s,
+    label:s
+}
+
+f nav_links():a:NavLink {
+    r [
+        NavLink { href = `#work`, label = `Work` },
+        NavLink { href = `#writing`, label = `Writing` },
+        NavLink { href = `#about`, label = `About` },
+        NavLink { href = `#contact`, label = `Contact` }
+    ];
+}
+
+f github_url():s {
+    r `https://github.com/AlexTDWilkinson`;
+}
+
+f theme_toggle_html():s {
+    r array_join([
+        `<button id="theme-toggle" type="button" aria-label="Toggle dark mode" `,
+        `class="inline-flex h-9 w-9 items-center justify-center rounded-lg border transition `,
+        border_soft(), ` `, text_body(), ` hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-800">`,
+        icon_theme(),
+        `</button>`
+    ], ``);
+}
+
+f header_html():s {
+    links:a:s = map link in nav_links() {
+        y array_join([
+            `<a href="`, link.href, `" class="rounded-md px-3 py-2 text-sm font-medium transition `,
+            text_body(), ` hover:text-zinc-900 dark:hover:text-zinc-50">`,
+            link.label,
+            `</a>`
+        ], ``);
+    };
+
+    r array_join([
+        `<header class="sticky top-0 z-50 border-b `, border_soft(),
+        ` bg-white/90 dark:bg-zinc-950/90 [@supports(backdrop-filter:blur(0))]:bg-white/70 [@supports(backdrop-filter:blur(0))]:backdrop-blur dark:[@supports(backdrop-filter:blur(0))]:bg-zinc-950/70">`,
+        `<nav class="`, container(), ` flex h-16 items-center justify-between">`,
+        `<a href="#top" class="group flex items-baseline gap-2">`,
+        `<span class="text-base font-bold tracking-tight `, text_strong(), `">Alex Wilkinson</span>`,
+        `<span class="hidden font-mono text-xs `, text_muted(), ` sm:inline">alex-wilkinson.ca</span>`,
+        `</a>`,
+        `<div class="flex items-center gap-1">`,
+        `<div class="hidden sm:flex sm:items-center">`, array_join(links, ``), `</div>`,
+        `<a href="`, github_url(), `" rel="me noopener" class="inline-flex h-9 w-9 items-center justify-center rounded-lg border transition `,
+        border_soft(), ` `, text_body(), ` hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-50 dark:hover:bg-zinc-800" aria-label="GitHub">`,
+        icon_github(`h-4 w-4`),
+        `</a>`,
+        theme_toggle_html(),
+        `</div>`,
+        `</nav>`,
+        `</header>`
+    ], ``);
+}
+
+f footer_html():s {
+    links:a:s = map link in nav_links() {
+        y array_join([
+            `<a href="`, link.href, `" class="transition hover:text-zinc-900 dark:hover:text-zinc-50">`,
+            link.label,
+            `</a>`
+        ], ``);
+    };
+
+    r array_join([
+        `<footer class="border-t `, border_soft(), `">`,
+        `<div class="`, container(), ` flex flex-col gap-4 py-10 sm:flex-row sm:items-center sm:justify-between">`,
+        `<p class="text-sm `, text_muted(), `">Alex Wilkinson - Calgary, Canada. This site is written in `,
+        `<a href="https://github.com/AlexTDWilkinson/Nail" class="font-medium underline decoration-emerald-500/60 underline-offset-4 hover:text-zinc-900 dark:hover:text-zinc-50">Nail</a>.</p>`,
+        `<div class="flex flex-wrap items-center gap-5 text-sm `, text_muted(), `">`,
+        array_join(links, ``),
+        `<a href="`, github_url(), `" rel="me noopener" class="inline-flex items-center gap-1.5 transition hover:text-zinc-900 dark:hover:text-zinc-50">`,
+        icon_github(`h-4 w-4`), `GitHub</a>`,
+        `</div>`,
+        `</div>`,
+        `</footer>`
+    ], ``);
+}
+
+// The full document. site.js is loaded in <head> without defer on purpose: it
+// sets the theme class on <html> before the first paint, so a visitor who
+// prefers dark never sees a white flash. Everything else in it waits for
+// DOMContentLoaded.
+f layout(title:s, description:s, content:s):s {
+    r array_join([
+        `<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>`, title, `</title>
+    <meta name="description" content="`, description, `">
+    <meta name="color-scheme" content="light dark">
+    <meta property="og:title" content="`, title, `">
+    <meta property="og:description" content="`, description, `">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alex-wilkinson.ca/">
+    <link rel="canonical" href="https://alex-wilkinson.ca/">
+    <link rel="stylesheet" href="/static/styles/app.css?v=1">
+    <link rel="icon" href="/static/images/favicon.svg" type="image/svg+xml">
+    <script src="/static/js/site.js?v=1"></script>
+</head>
+<body class="bg-white text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100">`,
+        header_html(),
+        `<main>`, content, `</main>`,
+        footer_html(),
+        `</body>
+</html>`
+    ], ``);
+}

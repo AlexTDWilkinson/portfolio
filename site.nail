@@ -1,0 +1,56 @@
+// alex-wilkinson.ca - a personal portfolio, written in Nail.
+//
+// The whole site is one static page, so there is nothing to fetch at startup
+// and no state to carry: the handler renders the same document every time and
+// the reverse proxy in front of it does the compression.
+
+insert(`nail/ui.nail`)
+insert(`nail/layout.nail`)
+insert(`nail/pages/home.nail`)
+
+// systemd hands the port down as PORT (see deploy/app.service.template); the
+// fallback is what a bare `./scripts/nail-build.sh --run` uses locally.
+f default_port(err:e):i {
+    r 3002;
+}
+
+f missing_env(err:e):s {
+    r ``;
+}
+
+port:i = safe(int_from(safe(env_get(`PORT`), missing_env)), default_port);
+
+f handle_request(request:HTTP_Request, state:h<s,s>):HTTP_Response {
+    headers:h<s,s> = hashmap_new();
+    if {
+        request.path == `/` => {
+            r html_response(200, home_page(), headers);
+        },
+        else => {
+            r html_response(404, not_found_page(), headers);
+        }
+    }
+}
+
+f html_response(status:i, body:s, headers:h<s,s>):HTTP_Response {
+    r HTTP_Response {
+        status = status,
+        body = body,
+        content_type = `text/html; charset=utf-8`,
+        headers = headers
+    };
+}
+
+state:h<s,s> = hashmap_new();
+
+config:HTTP_Config = HTTP_Config {
+    static_mounts = [
+        HTTP_Static { prefix = `/static`, directory = `static` }
+    ],
+    max_body_bytes = 0,
+    timeout_seconds = 0,
+    state = state
+};
+
+print(`Portfolio site starting on port `, port);
+http_server(port, config);

@@ -1,0 +1,125 @@
+// Shared UI pieces: the colour vocabulary, buttons, icons, section headings.
+//
+// Every colour on the site is named once here rather than inlined into the
+// pages, because each one has to be written twice - a light value and a `dark:`
+// value - and a pair that drifts apart is invisible until someone flips the
+// theme.
+
+f text_strong():s {
+    r `text-zinc-900 dark:text-zinc-50`;
+}
+
+f text_body():s {
+    r `text-zinc-600 dark:text-zinc-400`;
+}
+
+f text_muted():s {
+    r `text-zinc-500 dark:text-zinc-500`;
+}
+
+f text_accent():s {
+    r `text-emerald-600 dark:text-emerald-400`;
+}
+
+f border_soft():s {
+    r `border-zinc-200 dark:border-zinc-800`;
+}
+
+f surface_card():s {
+    r `bg-white dark:bg-zinc-900`;
+}
+
+f container():s {
+    r `mx-auto w-full max-w-5xl px-6 sm:px-8`;
+}
+
+f button_solid():s {
+    r array_join([
+        `inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white `,
+        `shadow-sm transition hover:bg-zinc-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 `,
+        `focus-visible:outline-emerald-600 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-white`
+    ], ``);
+}
+
+f button_outline():s {
+    r array_join([
+        `inline-flex items-center justify-center gap-2 rounded-lg border px-5 py-2.5 text-sm font-semibold transition `,
+        `focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 `,
+        `border-zinc-300 text-zinc-900 hover:border-zinc-400 hover:bg-zinc-50 `,
+        `dark:border-zinc-700 dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800`
+    ], ``);
+}
+
+// A link styled as a button. `extra` adds page-specific classes, `` for none.
+f link_button(href:s, variant:s, extra:s, label:s):s {
+    r array_join([
+        `<a href="`, href, `" class="`, variant, ` `, extra, `">`, label, `</a>`
+    ], ``);
+}
+
+f icon_github(class:s):s {
+    r array_join([
+        `<svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" class="`, class, `">`,
+        `<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>`,
+        `</svg>`
+    ], ``);
+}
+
+f icon_arrow(class:s):s {
+    r array_join([
+        `<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="`, class, `">`,
+        `<path d="M4 10h12M11 5l5 5-5 5"></path>`,
+        `</svg>`
+    ], ``);
+}
+
+// Both icons are always in the markup; CSS in styles/tailwind.css hides the
+// one that does not match the class on <html>, so the correct icon is right on
+// the very first paint.
+f icon_theme():s {
+    r array_join([
+        `<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" class="theme-icon-sun h-5 w-5">`,
+        `<circle cx="10" cy="10" r="3.4"></circle>`,
+        `<path d="M10 2.5v1.6M10 15.9v1.6M17.5 10h-1.6M4.1 10H2.5M15.3 4.7l-1.1 1.1M5.8 14.2l-1.1 1.1M15.3 15.3l-1.1-1.1M5.8 5.8 4.7 4.7"></path>`,
+        `</svg>`,
+        `<svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-moon h-5 w-5">`,
+        `<path d="M17 12.4A7.5 7.5 0 0 1 7.6 3 7.5 7.5 0 1 0 17 12.4Z"></path>`,
+        `</svg>`
+    ], ``);
+}
+
+// The small label that opens each section: a rule, then the word.
+f section_label(text:s):s {
+    r array_join([
+        `<div class="flex items-center gap-3">`,
+        `<span class="h-px w-8 bg-emerald-500/70"></span>`,
+        `<span class="font-mono text-xs uppercase tracking-[0.2em] `, text_accent(), `">`, text, `</span>`,
+        `</div>`
+    ], ``);
+}
+
+f section_heading(id:s, label:s, title:s, blurb:s):s {
+    r array_join([
+        `<div id="`, id, `" class="scroll-mt-24">`,
+        section_label(label),
+        `<h2 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl `, text_strong(), `">`, title, `</h2>`,
+        `<p class="mt-4 max-w-2xl text-lg leading-relaxed `, text_body(), `">`, blurb, `</p>`,
+        `</div>`
+    ], ``);
+}
+
+// A comma-separated list rendered as pills. Kept as one string rather than an
+// array because Nail arrays do not nest, and each project carries its own list.
+f tag_pills(tag_list:s):s {
+    tags:a:s = string_split(tag_list, `,`);
+    pills:a:s = map tag in tags {
+        y array_join([
+            `<li class="rounded-full border px-3 py-1 font-mono text-xs `, border_soft(), ` `, text_muted(), `">`,
+            string_trim(tag),
+            `</li>`
+        ], ``);
+    };
+    r array_join([
+        `<ul class="mt-6 flex flex-wrap gap-2">`, array_join(pills, ``), `</ul>`
+    ], ``);
+}

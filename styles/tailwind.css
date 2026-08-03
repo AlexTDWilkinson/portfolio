@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Anchor navigation on a single long page: without this, clicking a nav link
+   parks the section heading underneath the sticky header. */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* The theme toggle shows one of two icons. Which one is decided by the class
+   on <html>, so both live in the markup and CSS picks. */
+html.dark .theme-icon-sun {
+  display: none;
+}
+html:not(.dark) .theme-icon-moon {
+  display: none;
+}
